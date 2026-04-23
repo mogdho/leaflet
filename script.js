@@ -446,17 +446,37 @@ function downloadPDF() {
     saveItemHistory();
     
     const element = document.getElementById('invoice');
-    const container = document.querySelector('.preview-container');
     const invoiceNumber = document.getElementById('edit-invoice-number').value.replace(/[^0-9a-zA-Z-]/g, '');
     
-    // Temporarily fix styles for clean full-size capture
-    element.style.transform = 'none';
-    element.style.boxShadow = 'none'; // Shadow adds pixels outside the element
-    container.style.overflow = 'visible';
-    container.style.alignItems = 'flex-start';
-    
-    // Capture with html2canvas, then manually place on a single A4 page
-    html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+    // Show a loading indication on the button
+    const btn = document.getElementById('btn-download');
+    const originalText = btn.innerText;
+    btn.innerText = 'Generating...';
+    btn.disabled = true;
+
+    // Capture with html2canvas, using onclone to ensure the element is visible and properly styled
+    html2canvas(element, { 
+        scale: 2, 
+        useCORS: true,
+        onclone: (clonedDoc) => {
+            const clonedContainer = clonedDoc.querySelector('.preview-container');
+            const clonedInvoice = clonedDoc.getElementById('invoice');
+            
+            // Force container to be visible so html2canvas can capture its contents
+            if (clonedContainer) {
+                clonedContainer.style.display = 'flex';
+                clonedContainer.style.position = 'absolute'; // avoid affecting layout
+                clonedContainer.style.overflow = 'visible';
+                clonedContainer.style.alignItems = 'flex-start';
+            }
+            
+            // Remove transform from the cloned invoice to capture at full A4 size
+            if (clonedInvoice) {
+                clonedInvoice.style.transform = 'none';
+                clonedInvoice.style.boxShadow = 'none';
+            }
+        }
+    }).then(canvas => {
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
@@ -465,11 +485,13 @@ function downloadPDF() {
         pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
         pdf.save(`Invoice-${invoiceNumber || 'New'}.pdf`);
         
-        // Restore styles
-        element.style.transform = '';
-        element.style.boxShadow = '';
-        container.style.overflow = '';
-        container.style.alignItems = '';
-        scalePreview();
+        // Restore button state
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }).catch(err => {
+        console.error("PDF Generation Error:", err);
+        btn.innerText = originalText;
+        btn.disabled = false;
+        alert("There was an error generating the PDF. Please try again.");
     });
 }
