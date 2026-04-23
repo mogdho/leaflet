@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet - Invoice Maker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Toolbar -->
+    <div class="toolbar no-print">
+        <div class="toolbar-brand">🍃 Leaflet</div>
+        <div class="toolbar-actions">
+            <button id="btn-download" class="btn btn-primary">📥 Download PDF</button>
+        </div>
+    </div>
+
+    <!-- Workspace -->
+    <div class="workspace">
+        
+        <!-- LEFT: Editor Panel -->
+        <aside class="editor-panel no-print" id="editor-panel">
+            
+            <section class="editor-section">
+                <div class="editor-section-header">📋 Invoice Details</div>
+                <div class="editor-section-body">
+                    <div class="form-group">
+                        <label>Invoice Number</label>
+                        <input type="text" id="edit-invoice-number" value="#0000">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="edit-invoice-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="edit-invoice-due-date">
+                    </div>
+                </div>
+            </section>
+
+            <section class="editor-section">
+                <div class="editor-section-header">🏢 Company Info</div>
+                <div class="editor-section-body">
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="edit-company-name" value="Giggling Platypus co.">
+                    </div>
+                    <div class="form-group">
+                        <label>Address & Phone</label>
+                        <textarea id="edit-company-address" rows="3">123 Anywhere st., Any City
+123-456-7890</textarea>
+                    </div>
+                    <button id="btn-save-company" class="btn btn-save" style="width: 100%">Save to Browser</button>
+                </div>
+            </section>
+
+            <section class="editor-section">
+                <div class="editor-section-header">👤 Bill To</div>
+                <div class="editor-section-body">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" id="edit-client-name" value="Murad Naser">
+                    </div>
+                    <div class="form-group">
+                        <label>Client Address & Phone</label>
+                        <textarea id="edit-client-address" rows="3">123 Anywhere st., Any City
++123-456-7890</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="editor-section">
+                <div class="editor-section-header">💳 Payment Method</div>
+                <div class="editor-section-body">
+                    <div class="form-group">
+                        <label>Bank Name</label>
+                        <input type="text" id="edit-bank-name" value="Central Bank">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Holder</label>
+                        <input type="text" id="edit-account-holder" value="Samira Hadid">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="edit-account-number" value="123-456-7890">
+                    </div>
+                    <button id="btn-save-payment" class="btn btn-save" style="width: 100%">Save to Browser</button>
+                </div>
+            </section>
+
+            <section class="editor-section">
+                <div class="editor-section-header">📦 Items</div>
+                <div class="editor-section-body">
+                    <div id="editor-items-list">
+                        <!-- Items injected here by JS -->
+                    </div>
+                    <button id="btn-add-item" class="btn btn-secondary" style="width:100%; margin-top: 10px;">➕ Add Item</button>
+                    
+                    <!-- Suggestions Datalist -->
+                    <datalist id="item-suggestions"></datalist>
+                </div>
+            </section>
+
+            <section class="editor-section">
+                <div class="editor-section-header">💰 Totals & Currency</div>
+                <div class="editor-section-body">
+                    <div class="form-group">
+                        <label>Currency Symbol</label>
+                        <input type="text" id="edit-currency" value="$">
+                    </div>
+                    <div class="form-group">
+                        <label>Tax Rate (%)</label>
+                        <input type="number" id="edit-tax-rate" value="0" min="0" max="100" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Discount Amount</label>
+                        <input type="number" id="edit-discount-amount" value="0" min="0" step="0.01">
+                    </div>
+                    <button id="btn-save-totals" class="btn btn-save" style="width: 100%">Save to Browser</button>
+                </div>
+            </section>
+
+            <section class="editor-section">
+                <div class="editor-section-header">✍️ Footer / Signature</div>
+                <div class="editor-section-body">
+                    <div class="form-group">
+                        <label>Owner Name (Signature)</label>
+                        <input type="text" id="edit-owner-name" value="Samira Hadid">
+                    </div>
+                    <div class="form-group">
+                        <label>Title / Role</label>
+                        <input type="text" id="edit-owner-title" value="Manager">
+                    </div>
+                    <div class="form-group">
+                        <label>Terms & Conditions</label>
+                        <textarea id="edit-terms" rows="3">Lorem ipsum dolor sit amet, consectetur adipiscing elit,</textarea>
+                    </div>
+                    <button id="btn-save-footer" class="btn btn-save" style="width: 100%">Save to Browser</button>
+                </div>
+            </section>
+            
+        </aside>
+
+        <!-- RIGHT: Live Invoice Preview -->
+        <div class="preview-container">
+            <div class="invoice-paper" id="invoice">
+                <!-- Header -->
+                <header class="invoice-header">
+                    <div class="company-info">
+                        <h1 id="preview-company-name">Giggling Platypus co.</h1>
+                        <div id="preview-company-address">123 Anywhere st., Any City<br>123-456-7890</div>
+                    </div>
+                    <div class="invoice-meta">
+                        <h1 class="invoice-title">INVOICE</h1>
+                        <div class="meta-row">
+                            <span>Invoice Number:</span>
+                            <span id="preview-invoice-number">#1234</span>
+                        </div>
+                        <div class="meta-row">
+                            <span>Date:</span>
+                            <span id="preview-invoice-date"></span>
+                        </div>
+                        <div class="meta-row">
+                            <span>Due Date:</span>
+                            <span id="preview-invoice-due-date"></span>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Billing Info -->
+                <section class="billing-info">
+                    <div class="bill-to">
+                        <h2>BILL TO:</h2>
+                        <div id="preview-client-name" class="bold">Murad Naser</div>
+                        <div id="preview-client-address">123 Anywhere st., Any City<br>+123-456-7890</div>
+                    </div>
+                    <div class="payment-method">
+                        <h2>Payment Method</h2>
+                        <div id="preview-bank-name" class="bold">Central Bank</div>
+                        <div id="preview-account-holder" class="bold">Samira Hadid</div>
+                        <div id="preview-account-number" class="bold">123-456-7890</div>
+                    </div>
+                </section>
+
+                <!-- Items Table -->
+                <section class="items-table">
+                    <div class="table-header">
+                        <div class="col-no">NO</div>
+                        <div class="col-desc">ITEM DESCRIPTION</div>
+                        <div class="col-price">PRICE</div>
+                        <div class="col-qty">QTY</div>
+                        <div class="col-total">TOTAL</div>
+                    </div>
+                    <div id="preview-items-body">
+                        <!-- Items injected here by JS -->
+                    </div>
+                </section>
+
+                <!-- Totals -->
+                <section class="totals-section">
+                    <div class="totals-grid">
+                        <div class="totals-row">
+                            <span>Total</span>
+                            <span id="preview-sub-total">$0.00</span>
+                        </div>
+                        <div class="totals-row">
+                            <span>Tax (<span id="preview-tax-percent">0</span>%)</span>
+                            <span id="preview-tax-amount">$0.00</span>
+                        </div>
+                        <div class="totals-row">
+                            <span>Discount</span>
+                            <span id="preview-discount-amount">$0.00</span>
+                        </div>
+                        <div class="totals-row grand-total">
+                            <span>Sub Total</span>
+                            <span id="preview-grand-total">$0.00</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="invoice-footer">
+                    <div class="terms">
+                        <h2>Term and Conditions:</h2>
+                        <div id="preview-terms-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit,</div>
+                    </div>
+                    <div class="signature-section">
+                        <div class="signature" id="preview-signature-text">Samira Hadid</div>
+                        <div class="signature-name" id="preview-owner-name">Samira Hadid</div>
+                        <div class="signature-title" id="preview-owner-title">Manager</div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Preview Toggle for Mobile -->
+    <button id="btn-toggle-preview" class="floating-toggle-btn no-print" title="Toggle Preview">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

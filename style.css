@@ -1,0 +1,634 @@
+:root {
+    --primary: #1F6F5F;
+    --secondary: #2FA084;
+    --action: #6FCF97;
+    --background: #EEEEEE;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #666666;
+    --border-color: #E2E8F0;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    line-height: 1.5;
+    height: 100vh;
+    overflow-y: hidden; /* Main body doesn't scroll, panels do */
+}
+
+/* Typography Utility */
+.bold {
+    font-weight: 600;
+}
+
+/* Toolbar */
+.toolbar {
+    background-color: var(--surface);
+    padding: 1rem 2rem;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.toolbar-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--primary);
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background-color: var(--background);
+}
+
+.btn-primary {
+    background-color: var(--action);
+    color: #000;
+    border-color: var(--action);
+}
+
+.btn-primary:hover {
+    background-color: #5bbd86;
+}
+
+/* Workspace */
+.workspace {
+    display: flex;
+    padding: 2rem;
+    gap: 2rem;
+    height: calc(100vh - 70px);
+    overflow: hidden;
+}
+
+/* Editor Panel */
+.editor-panel {
+    width: 380px;
+    flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 15px; /* space for scrollbar */
+}
+
+/* Custom Scrollbar */
+.editor-panel::-webkit-scrollbar,
+.preview-container::-webkit-scrollbar {
+    width: 8px;
+}
+.editor-panel::-webkit-scrollbar-track,
+.preview-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.editor-panel::-webkit-scrollbar-thumb,
+.preview-container::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+.editor-panel::-webkit-scrollbar-thumb:hover,
+.preview-container::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+}
+
+.editor-section {
+    background-color: var(--surface);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.editor-section-header {
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #f8fafc;
+    border-bottom: 1px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+.editor-section:not(.collapsed) .editor-section-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.editor-section-header:hover {
+    background-color: #f1f5f9;
+}
+
+.editor-section-header::after {
+    content: '▼';
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+}
+
+.editor-section.collapsed .editor-section-header::after {
+    transform: rotate(-90deg);
+}
+
+.editor-section-body {
+    padding: 1.25rem;
+    display: block;
+}
+
+.editor-section.collapsed .editor-section-body {
+    display: none;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+    color: var(--text-primary);
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(47, 160, 132, 0.1);
+    outline: none;
+}
+
+.btn-secondary {
+    background-color: #fff;
+    border: 1px solid var(--action);
+    color: var(--text-primary);
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--action);
+    color: #000;
+}
+
+.btn-save {
+    background-color: var(--secondary);
+    border: 1px solid var(--secondary);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-save:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Editor Item Cards */
+.item-card {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8fafc;
+    position: relative;
+}
+
+.item-card .form-group {
+    margin-bottom: 0.75rem;
+}
+
+.item-card .row-flex {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.item-card .row-flex .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.btn-delete-item {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ffe4e6;
+    border: none;
+    color: #e11d48;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+.btn-delete-item:hover {
+    background: #fecdd3;
+}
+
+/* Preview Panel */
+.preview-container {
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center scaling */
+    overflow: hidden; /* No scrolling needed with scale */
+}
+
+/* Invoice Paper */
+.invoice-paper {
+    background-color: var(--surface);
+    width: 210mm; /* A4 width */
+    height: 297mm; /* A4 height fixed for scaling */
+    padding: 35px 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transform: scale(var(--preview-scale, 1));
+    transform-origin: center center;
+    overflow: hidden;
+    font-size: 0.88rem;
+}
+
+/* Header */
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+}
+
+.company-info {
+    max-width: 55%;
+}
+
+#preview-company-name {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 0.4rem;
+    color: var(--text-primary);
+    word-wrap: break-word;
+}
+
+#preview-company-address {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.invoice-meta {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.invoice-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+    line-height: 1;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+}
+
+.meta-row > span:last-child {
+    min-width: 100px;
+    text-align: right;
+}
+
+/* Billing Info */
+.billing-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.billing-info h2 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+    color: var(--text-primary);
+}
+
+.bill-to #preview-client-name {
+    margin-bottom: 0.25rem;
+}
+
+.bill-to #preview-client-address {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.payment-method {
+    text-align: right;
+}
+
+.payment-method h2 {
+    color: var(--text-primary);
+}
+
+.payment-method > div {
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+/* Items Table */
+.items-table {
+    margin-bottom: 1rem;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 30px 1fr 90px 60px 90px;
+    gap: 0.75rem;
+    padding-bottom: 0.4rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    align-items: center;
+    border-bottom: 2px solid var(--text-primary);
+}
+
+.invoice-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 90px 60px 90px;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    align-items: flex-start;
+}
+
+.col-no { text-align: center; font-weight: 600; padding-top: 2px; font-size: 0.95rem; }
+.col-price, .col-total { text-align: right; font-size: 0.95rem; }
+.col-qty { text-align: center; font-size: 0.95rem; }
+
+.item-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+}
+
+.item-desc {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.3;
+    white-space: pre-wrap;
+}
+
+/* Totals */
+.totals-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+.totals-grid {
+    width: 280px;
+    border-top: 2px solid var(--text-primary);
+    padding-top: 1rem;
+}
+
+.totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.grand-total {
+    border-top: 2px solid var(--text-primary);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    font-weight: 700;
+}
+
+/* Footer */
+.invoice-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+}
+
+.terms {
+    width: 50%;
+}
+
+.terms h2 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+#preview-terms-text {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.signature-section {
+    text-align: right;
+    min-width: 200px;
+}
+
+.signature {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.signature-name {
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-bottom: 0.15rem;
+}
+
+.signature-title {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Mobile Responsiveness & Floating Preview */
+.floating-toggle-btn {
+    display: none; /* Hidden on desktop */
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 200;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--secondary);
+    color: #fff;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(47, 160, 132, 0.4);
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.floating-toggle-btn:hover {
+    transform: scale(1.05);
+    background-color: var(--primary);
+}
+
+.floating-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.floating-toggle-btn svg {
+    color: #fff;
+    width: 24px;
+    height: 24px;
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+    }
+
+    .toolbar {
+        padding: 1rem;
+    }
+
+    .workspace {
+        flex-direction: column;
+        padding: 1rem;
+        height: auto;
+        overflow: visible;
+        gap: 0;
+    }
+
+    .editor-panel {
+        width: 100%;
+        height: auto;
+        overflow-y: visible;
+        padding-right: 0;
+    }
+
+    .preview-container {
+        display: none; /* Hidden by default on mobile */
+    }
+
+    .floating-toggle-btn {
+        display: flex;
+    }
+
+    /* Active Mobile Preview State */
+    body.mobile-preview-active {
+        overflow: hidden; /* Prevent background scrolling */
+    }
+
+    body.mobile-preview-active .preview-container {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 150;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 2rem;
+        align-items: center;
+        justify-content: center;
+    }
+
+    body.mobile-preview-active .floating-toggle-btn {
+        background-color: #ef4444; /* Red close button */
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+    
+    body.mobile-preview-active .floating-toggle-btn:hover {
+        background-color: #dc2626;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body { background-color: #fff; height: auto; overflow: visible; }
+    .no-print, .toolbar, .editor-panel { display: none !important; }
+    .workspace { padding: 0; display: block; height: auto; overflow: visible; }
+    .preview-container { padding: 0; display: block; height: auto; overflow: visible; }
+    .invoice-paper { box-shadow: none; width: 100%; padding: 0; min-height: auto; }
+}
