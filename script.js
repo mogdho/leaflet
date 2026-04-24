@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Bind all inputs to update the preview
     setupLiveSync();
-    
+
     // Initial sync
     syncToPreview();
-    
+
     // Load item history for suggestions
     loadItemHistory();
-    
+
     // Initial scale and window resize binding
     scalePreview();
     window.addEventListener('resize', scalePreview);
@@ -39,23 +39,23 @@ document.addEventListener('DOMContentLoaded', () => {
 function scalePreview() {
     const container = document.querySelector('.preview-container');
     const invoice = document.getElementById('invoice');
-    
+
     // Get available dimensions
     const availableHeight = container.clientHeight - 40; // 40px padding
     const availableWidth = container.clientWidth - 40;
-    
+
     // Temporarily reset scale to measure natural dimensions
     invoice.style.setProperty('--preview-scale', 1);
-    
+
     const naturalWidth = invoice.offsetWidth;
     const naturalHeight = invoice.offsetHeight;
-    
+
     const scaleWidth = availableWidth / naturalWidth;
     const scaleHeight = availableHeight / naturalHeight;
-    
+
     // Use the smallest scale to ensure it fits both width and height, but never scale up > 1
     const scale = Math.min(scaleWidth, scaleHeight, 1);
-    
+
     invoice.style.setProperty('--preview-scale', scale);
 }
 
@@ -72,10 +72,10 @@ function setupCollapsibleSections() {
 // Mobile Preview Toggle
 function toggleMobilePreview() {
     document.body.classList.toggle('mobile-preview-active');
-    
+
     const isActive = document.body.classList.contains('mobile-preview-active');
     const btn = document.getElementById('btn-toggle-preview');
-    
+
     if (btn) {
         if (isActive) {
             btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
@@ -83,7 +83,7 @@ function toggleMobilePreview() {
             btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
         }
     }
-    
+
     if (isActive) {
         // Recalculate scale after a short delay so the container is fully rendered
         setTimeout(() => scalePreview(), 50);
@@ -98,7 +98,7 @@ function setupLiveSync() {
         if (e.target.closest('.item-card')) {
             updateItemData(e.target);
         }
-        
+
         // Sync everything
         syncToPreview();
     });
@@ -114,6 +114,15 @@ function setupLiveSync() {
         });
         renderEditorItems();
         syncToPreview();
+    });
+
+    // Currency Buttons
+    document.querySelectorAll('.btn-currency').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.btn-currency').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            syncToPreview();
+        });
     });
 
     // Save Buttons
@@ -164,16 +173,16 @@ function renderEditorItems() {
         const card = document.createElement('div');
         card.className = 'item-card';
         card.dataset.id = item.id;
-        
+
         const nameInput = document.createElement('input');
         nameInput.type = 'text';
         nameInput.className = 'item-name-input';
         nameInput.value = item.name;
         nameInput.setAttribute('list', 'item-suggestions');
-        
+
         nameInput.oninput = (e) => {
             item.name = e.target.value;
-            
+
             // Auto-fill price if it matches history
             const matchedHistory = itemHistory.find(h => h.name.toLowerCase() === item.name.toLowerCase());
             if (matchedHistory && matchedHistory.price) {
@@ -208,7 +217,7 @@ function renderEditorItems() {
                 </div>
             </div>
         `;
-        
+
         // Then append the dynamically created name input to its group
         card.querySelector('.name-group').appendChild(nameInput);
         list.appendChild(card);
@@ -229,7 +238,7 @@ function syncToPreview() {
 
     // 1. Invoice Details
     document.getElementById('preview-invoice-number').innerText = getVal('edit-invoice-number');
-    
+
     // Format dates nicely
     const dateVal = getVal('edit-invoice-date');
     const dueDateVal = getVal('edit-invoice-due-date');
@@ -250,12 +259,13 @@ function syncToPreview() {
     document.getElementById('preview-account-number').innerText = getVal('edit-account-number');
 
     // 5. Currency
-    const currency = getVal('edit-currency') || '$';
+    const activeCurrencyBtn = document.querySelector('.btn-currency.active');
+    const currency = activeCurrencyBtn ? activeCurrencyBtn.dataset.symbol : '$';
 
     // 6. Items Table
     const previewItemsBody = document.getElementById('preview-items-body');
     previewItemsBody.innerHTML = '';
-    
+
     let subtotal = 0;
 
     itemsData.forEach((item, index) => {
@@ -291,8 +301,12 @@ function syncToPreview() {
     document.getElementById('preview-grand-total').innerText = `${currency}${grandTotal.toFixed(2)}`;
 
     // 8. Footer
-    document.getElementById('preview-owner-name').innerText = getVal('edit-owner-name');
-    document.getElementById('preview-signature-text').innerText = getVal('edit-owner-name'); // Cursive
+    const ownerName = getVal('edit-owner-name');
+    const doubleSpacedName = ownerName.replace(/ /g, '&nbsp;&nbsp;');
+    const singleSpacedName = ownerName.replace(/ /g, '&nbsp;');
+    
+    document.getElementById('preview-owner-name').innerHTML = doubleSpacedName;
+    document.getElementById('preview-signature-text').innerHTML = singleSpacedName; // Cursive
     document.getElementById('preview-owner-title').innerText = getVal('edit-owner-title');
     document.getElementById('preview-terms-text').innerText = getVal('edit-terms');
 }
@@ -307,9 +321,9 @@ function saveItemHistory() {
     // Collect current items
     itemsData.forEach(item => {
         if (!item.name || item.name.trim() === '') return;
-        
+
         const existingIndex = itemHistory.findIndex(h => h.name.toLowerCase() === item.name.trim().toLowerCase());
-        
+
         if (existingIndex >= 0) {
             // Update price if they changed it
             itemHistory[existingIndex].price = item.price;
@@ -318,12 +332,12 @@ function saveItemHistory() {
             itemHistory.push({ name: item.name.trim(), price: item.price });
         }
     });
-    
+
     // Keep last 50 items to prevent bloat
     if (itemHistory.length > 50) {
         itemHistory = itemHistory.slice(-50);
     }
-    
+
     localStorage.setItem('leaflet-item-history', JSON.stringify(itemHistory));
     loadItemHistory(); // Refresh datalist
 }
@@ -337,7 +351,7 @@ function loadItemHistory() {
             itemHistory = [];
         }
     }
-    
+
     const dataList = document.getElementById('item-suggestions');
     if (dataList) {
         dataList.innerHTML = '';
@@ -369,12 +383,13 @@ function savePaymentMethod() {
 }
 
 function saveTotalsInfo() {
+    const activeCurrencyBtn = document.querySelector('.btn-currency.active');
     const info = {
-        currency: document.getElementById('edit-currency').value,
+        currency: activeCurrencyBtn ? activeCurrencyBtn.dataset.symbol : '$',
         taxRate: document.getElementById('edit-tax-rate').value
     };
     localStorage.setItem('leaflet-totals', JSON.stringify(info));
-    alert('Currency and Tax settings saved to browser!');
+    alert('Totals info saved to browser!');
 }
 
 function saveFooterInfo() {
@@ -411,31 +426,39 @@ function loadSettings() {
     const company = localStorage.getItem('leaflet-company');
     if (company) {
         const data = JSON.parse(company);
-        if(data.name) document.getElementById('edit-company-name').value = data.name;
-        if(data.address) document.getElementById('edit-company-address').value = data.address;
+        if (data.name) document.getElementById('edit-company-name').value = data.name;
+        if (data.address) document.getElementById('edit-company-address').value = data.address;
     }
 
     const payment = localStorage.getItem('leaflet-payment');
     if (payment) {
         const data = JSON.parse(payment);
-        if(data.bankName) document.getElementById('edit-bank-name').value = data.bankName;
-        if(data.accountHolder) document.getElementById('edit-account-holder').value = data.accountHolder;
-        if(data.accountNumber) document.getElementById('edit-account-number').value = data.accountNumber;
+        if (data.bankName) document.getElementById('edit-bank-name').value = data.bankName;
+        if (data.accountHolder) document.getElementById('edit-account-holder').value = data.accountHolder;
+        if (data.accountNumber) document.getElementById('edit-account-number').value = data.accountNumber;
     }
 
     const totals = localStorage.getItem('leaflet-totals');
     if (totals) {
         const data = JSON.parse(totals);
-        if(data.currency) document.getElementById('edit-currency').value = data.currency;
-        if(data.taxRate) document.getElementById('edit-tax-rate').value = data.taxRate;
+        if (data.currency) {
+            document.querySelectorAll('.btn-currency').forEach(btn => {
+                if (btn.dataset.symbol === data.currency) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        if (data.taxRate) document.getElementById('edit-tax-rate').value = data.taxRate;
     }
 
     const footer = localStorage.getItem('leaflet-footer');
     if (footer) {
         const data = JSON.parse(footer);
-        if(data.ownerName) document.getElementById('edit-owner-name').value = data.ownerName;
-        if(data.ownerTitle) document.getElementById('edit-owner-title').value = data.ownerTitle;
-        if(data.terms) document.getElementById('edit-terms').value = data.terms;
+        if (data.ownerName) document.getElementById('edit-owner-name').value = data.ownerName;
+        if (data.ownerTitle) document.getElementById('edit-owner-title').value = data.ownerTitle;
+        if (data.terms) document.getElementById('edit-terms').value = data.terms;
     }
 }
 
@@ -444,10 +467,10 @@ function downloadPDF() {
     // Auto-save invoice number and item history on download
     saveInvoiceDetails();
     saveItemHistory();
-    
+
     const element = document.getElementById('invoice');
     const invoiceNumber = document.getElementById('edit-invoice-number').value.replace(/[^0-9a-zA-Z-]/g, '');
-    
+
     // Show a loading indication on the button
     const btn = document.getElementById('btn-download');
     const originalText = btn.innerText;
@@ -455,13 +478,14 @@ function downloadPDF() {
     btn.disabled = true;
 
     // Capture with html2canvas, using onclone to ensure the element is visible and properly styled
-    html2canvas(element, { 
-        scale: 2, 
+    html2canvas(element, {
+        scale: 2,
         useCORS: true,
+        letterRendering: 1,
         onclone: (clonedDoc) => {
             const clonedContainer = clonedDoc.querySelector('.preview-container');
             const clonedInvoice = clonedDoc.getElementById('invoice');
-            
+
             // Force container to be visible so html2canvas can capture its contents
             if (clonedContainer) {
                 clonedContainer.style.display = 'flex';
@@ -469,22 +493,33 @@ function downloadPDF() {
                 clonedContainer.style.overflow = 'visible';
                 clonedContainer.style.alignItems = 'flex-start';
             }
-            
+
             // Remove transform from the cloned invoice to capture at full A4 size
             if (clonedInvoice) {
                 clonedInvoice.style.transform = 'none';
                 clonedInvoice.style.boxShadow = 'none';
+                // Fix for html2canvas missing spaces bug:
+                clonedInvoice.style.letterSpacing = 'normal';
+                clonedInvoice.style.fontVariantLigatures = 'none';
+                clonedInvoice.style.textRendering = 'optimizeLegibility';
+
+                // Force all child nodes to inherit standard spacing to avoid squishing
+                const allElements = clonedInvoice.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.letterSpacing = 'normal';
+                    el.style.wordSpacing = 'normal';
+                });
             }
         }
     }).then(canvas => {
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        
+
         // Force the image onto exactly one A4 page (210 x 297 mm)
         pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
         pdf.save(`Invoice-${invoiceNumber || 'New'}.pdf`);
-        
+
         // Restore button state
         btn.innerText = originalText;
         btn.disabled = false;
