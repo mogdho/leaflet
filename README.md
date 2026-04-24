@@ -1,5 +1,11 @@
 # Leaflet - Invoice Maker 📄🌿
 
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
+![Platform: GitHub Pages](https://img.shields.io/badge/Platform-GitHub_Pages-black?style=for-the-badge&logo=github)
+
 Leaflet is a beautiful, responsive, fully client-side invoice generator built with Vanilla JavaScript, HTML5, and CSS3. It allows freelancers, contractors, and small business owners to quickly generate professional, high-quality A4 PDF invoices directly from their browser, without the need for a backend or user accounts.
 
 ## ✨ Features
