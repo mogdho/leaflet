@@ -34,18 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial scale and window resize binding
     scalePreview();
     window.addEventListener('resize', scalePreview);
-
-    // Preloader Timeout (3 seconds)
-    setTimeout(() => {
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-            preloader.classList.add('fade-out');
-            // Re-enable scrolling if it was disabled (optional, depends on UI)
-            document.body.style.overflowY = 'auto';
-            // Trigger a resize to fix any scale issues after preloader disappears
-            scalePreview();
-        }
-    }, 3000);
 });
 
 function scalePreview() {
