@@ -40,3 +40,11 @@ Since Leaflet is a static web application, deployment is instantaneous.
 1. **Clone the repository:**
    ```bash
    git clone [https://github.com/mogdho/leaflet.git](https://github.com/mogdho/leaflet.git)
+   ```
+
+### 👨‍💻 Author
+
+**Mogdho Paul**
+
+🔗 GitHub: [github.com/mogdho](https://github.com/mogdho)
+📂 Source: [CleanUp-your-system](https://github.com/mogdho/leaflet)
